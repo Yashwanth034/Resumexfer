@@ -1,0 +1,31 @@
+# Python / test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.out
+
+# Build and release output
+/dist/
+/.rt_crosscheck/
+/*.deb
+*.exe
+
+# RepoTunnel/private validation evidence
+/.rt_hw/
+/.repotunnel-tmp/
+/CHECKPOINT_HANDOFF.txt
+
+# Local editor / OS state
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Local configuration and secret material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx

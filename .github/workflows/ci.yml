@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Public safety check
+        run: python3 scripts/public-safety-check.py
+      - name: Full project verification
+        env:
+          RESUMEXFER_SKIP_STRESS: "1"
+        run: bash scripts/verify.sh
+      - name: Transfer reliability matrix
+        run: bash scripts/transfer-matrix-check.sh
+
+  cross-platform-binaries:
+    runs-on: ubuntu-24.04
+    needs: test-linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build Linux, Windows and macOS standalone binaries
+        run: bash scripts/build-cross-platform.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resumexfer-cross-platform
+          path: |
+            dist/resumexfer_*
+          if-no-files-found: error

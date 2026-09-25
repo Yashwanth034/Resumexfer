@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+RUNTIME_BASE=${RESUMEXFER_RUNTIME_BASE:-/run/user}
+
+stop_user() {
+    runtime=$1
+    uid=${runtime##*/}
+    user=$(getent passwd "$uid" | cut -d: -f1)
+    [ -n "$user" ] || return 0
+    [ -S "$runtime/bus" ] || return 0
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" DBUS_SESSION_BUS_ADDRESS="unix:path=$runtime/bus" systemctl --user disable --now resumexfer.service >/dev/null 2>&1 || true
+}
+
+if [ "${1:-}" = remove ] || [ "${1:-}" = deconfigure ]; then
+    systemctl --global disable resumexfer.service >/dev/null 2>&1 || true
+    for runtime in "$RUNTIME_BASE"/[0-9]*; do
+        [ -d "$runtime" ] || continue
+        stop_user "$runtime"
+    done
+fi
+
+exit 0

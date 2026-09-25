@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/_common.sh"
+
+PORTAL='^(TestShareServesRangeAndRejectsChangedSource|TestSingleFileSharePageUsesDirectDownloadInsteadOfZip|TestShareDirectoryProvidesDownloadAllZip|TestReceiveUploadResumesFromExistingPartialAndPromotesSafely|TestReceiveUploadRejectsChangedSourceWithSameNameAndSize|TestReceiveCreatesZeroByteFiles|TestReceiveRejectsTraversalAndExistingDestination|TestReceiveMultiFileBatchWaitsForExplicitFinish|TestReceiveStreamingUploadCompletesExactBytesAndCleansCheckpoint|TestReceiveUploadWithStoreRejectsCorruptEngineCheckpoint)$'
+RECOVERY='^(TestPhoneToLaptopRecoveryContinuesWholeManifest|TestPhoneToLaptopRecoveryRejectsSameSizeWrongDestination|TestLaptopToPhoneRecoveryRejectsSameSizeWrongPartial|TestLaptopToPhoneRecoveryRejectsSameSizeWrongDestination|TestUploadVerificationRejectsSameSizeCorruption|TestManagedExactExistingDestinationIsRecordedAsDuplicate|TestManagedDifferentNameExistingContentIsSkippedAsDuplicate|TestManagedDifferentNameSameSizeDifferentContentTransfersNormally|TestManagedDuplicateWithinSameJobDifferentNamesTransfersOnlyFirst|TestManagedExactPathConflictWinsOverDifferentNameDuplicate)$'
+
+run_timeout 180 "portal correctness" go test -count=1 ./internal/portal -run "$PORTAL" -v
+run_timeout 180 "recovery integrity and duplicate handling" go test -count=1 ./internal/recovery -run "$RECOVERY" -v
+run_timeout 180 "engine/state correctness" go test -count=1 ./internal/engine ./internal/fingerprint ./internal/state
+
+printf '\nCORRECTNESS BATCH: PASS\n'

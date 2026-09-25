@@ -1,0 +1,29 @@
+#!/bin/sh
+set -e
+
+RUNTIME_BASE=${RESUMEXFER_RUNTIME_BASE:-/run/user}
+
+reload_user() {
+    runtime=$1
+    uid=${runtime##*/}
+    user=$(getent passwd "$uid" | cut -d: -f1)
+    [ -n "$user" ] || return 0
+    [ -S "$runtime/bus" ] || return 0
+
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" DBUS_SESSION_BUS_ADDRESS="unix:path=$runtime/bus" systemctl --user daemon-reload >/dev/null 2>&1 || true
+
+    runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" DBUS_SESSION_BUS_ADDRESS="unix:path=$runtime/bus" nemo -q >/dev/null 2>&1 || true
+    sleep 0.2
+    if pgrep -u "$uid" -x nemo >/dev/null 2>&1; then
+        pkill -TERM -u "$uid" -x nemo >/dev/null 2>&1 || true
+    fi
+}
+
+if [ "${1:-}" = remove ] || [ "${1:-}" = purge ]; then
+    for runtime in "$RUNTIME_BASE"/[0-9]*; do
+        [ -d "$runtime" ] || continue
+        reload_user "$runtime"
+    done
+fi
+
+exit 0

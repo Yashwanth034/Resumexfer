@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Verify tag matches VERSION
+        shell: bash
+        run: |
+          expected="v$(tr -d '[:space:]' < VERSION)"
+          test "$GITHUB_REF_NAME" = "$expected" || {
+            echo "Tag $GITHUB_REF_NAME does not match VERSION ($expected)" >&2
+            exit 1
+          }
+      - name: Public safety check
+        run: python3 scripts/public-safety-check.py
+      - name: Full project verification
+        env:
+          RESUMEXFER_SKIP_STRESS: "1"
+        run: bash scripts/verify.sh
+      - name: Transfer reliability matrix
+        run: bash scripts/transfer-matrix-check.sh
+      - name: Build portable binaries
+        run: bash scripts/build-cross-platform.sh
+      - name: Build Linux Debian package
+        run: bash scripts/build-deb.sh
+      - name: Add Debian package to release checksums
+        shell: bash
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          (
+            cd dist
+            sha256sum "resumexfer_${version}_amd64.deb" >> "resumexfer_${version}_SHA256SUMS.txt"
+            sha256sum -c "resumexfer_${version}_SHA256SUMS.txt"
+          )
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/resumexfer_* \
+            --generate-notes \
+            --title "Resumexfer $GITHUB_REF_NAME"

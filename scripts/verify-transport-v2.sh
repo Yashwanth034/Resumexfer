@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT"
+
+export GOTOOLCHAIN=${GOTOOLCHAIN:-go1.23.2}
+
+PORTAL_TESTS='^(TestReceiveMultiFileBatchWaitsForExplicitFinish|TestStreamingUploadWithPortalStateDoesNotDeadlock|TestManagedReceiveUsesBoundedUSBCheckpointProof|TestFastWebRTCDownloadTransfersExactBytes|TestFastWebRTCDownloadResumesFromStoredOffset|TestReceiveStreamingUploadCompletesExactBytesAndCleansCheckpoint|TestSendPageUsesPipelinedFastPathAndLargeFileDirectFallback|TestReceivePageUsesContinuousStreamingUpload|TestCompactPortalURLAndLegacyPathParsing|TestTrackingResponseWriterKeepsFileBackedReaderFrom|TestTrackingReadSeekerBatchesProgressCallbacks|TestSingleFileSharePageUsesDirectDownloadInsteadOfZip|TestDefaultPortalAddressAndTokenStayCompact|TestConfiguredPortalPortFallsBackWhenBusy|TestReceiveUploadRejectsChangedSourceWithSameNameAndSize|TestReceiveUploadSurvivesAbruptPortalRestart|TestShareRejectsSameMetadataContentReplacement|TestShareZipRejectsSameMetadataContentReplacement|TestReceivePageLearnsUpdatedRoutesAndAllowsCrossOriginAPI|TestSendPageRetargetsDownloadsAcrossUpdatedRoutes|TestReceiveUploadContinuesAcrossPortalRouteAddresses|TestReceiveUploadSerializesSameOffsetAcrossPortalRoutes|TestSharedFileRangeContinuesAcrossPortalRouteAddresses|TestManagedReceiveStartsAfterInterruptedLargeRecovery|TestManagedReceiveContinuesSameManifestFromVerifiedPhysicalPartial|TestManagedReceiveKeepsLeaseWhileSlowChunkIsActive|TestManagedReceiveHandsOffFromWifiToUSBWithoutRestarting|TestManagedReceiveRejectsChangedSourceAndPartialRace|TestAdoptReceivePartialFreezesVerifiedWirelessCheckpointForUSB|TestAdoptReceivePartialRejectsChangedSourceWithoutFreezingWirelessUpload|TestReceiveUploadWithStoreRestartsFromEngineCheckpoint|TestReceiveUploadWithStoreRejectsCorruptEngineCheckpoint|TestSessionInfoRoutesPreserveLegacyURLs|TestClassifyNetworkInterface|TestNetworkLinksFromSysfsReportsConnectedUnconfiguredLinks|TestSessionInfoExposesLinkReadiness|TestCloseReceiveCleansAbandonedPartialAndEngineState|TestExpiredReceiveCleansAbandonedPartialAndEngineState|TestOpenCleansExpiredPersistedReceivePartialAndEngineState|TestCloseManagedReceivePreservesPartialAndReleasesLease|TestCloseReceiveWaitsForActiveWriterThenCleansPartial)$'
+DAEMON_TESTS='^(TestHandlePortalShareReceiveStatusAndClose|TestHandlePortalPrepareLinkAllowsOnlyLiveUnconfiguredWiredInterface|TestManagedCancelQueuesCleanupWhileAnotherTransportOwnsManifest|TestLargeOrdinaryWifiUploadAdoptsCheckpointIntoManagedUSBRecovery|TestOrdinaryWifiUploadAdoptsVerifiedCheckpointIntoManagedUSBRecovery)$'
+RECOVERY_TESTS='^(TestRecoveryRespectsCompetingTransportLeaseAndReleasesAfterSuccess|TestManagedRecoveryRejectsChangedExplicitWirelessCandidateBeforeUSBAdoption|TestLargeManagedDownloadPersistsSourceIdentityBeforeInterruption|TestManagedPhoneToLaptopReportsProgressBeforeLargeCheckpoint|TestManagedPhoneToLaptopPauseKeepsDisplayedProgressDurable|TestManagedUploadStreamUsesLargeWritesWithoutPeriodicDeviceSync|TestManagedUploadPersistsEarlyFreshProgressBeforeSecondWrite)$'
+PRESERVE_TESTS='^(TestIsTrackedDestinationIgnoresCancelledManifest|TestPreserveWhenDiscardsCandidateIfTrackingEndsDuringPreserve)$'
+ENGINE_TESTS='^(TestStreamRemoteUploadCompletesExactBytes|TestStreamRemoteUploadCheckpointsCompleteChunksOnInterruption|TestProgressErrorFlushesPendingCheckpoint|TestProgressCanAdvanceMoreFrequentlyThanDurabilityCheckpoints|TestRemoteUploadRestartsFromVerifiedDurableChunks|TestRemoteUploadRejectsChangedSourceIdentityBeforeAdoptingPartial|TestRemoteUploadRejectsCorruptCheckpointedPartial)$'
+STATE_TESTS='^(TestManifestTransportLeaseSerializesWritersAndRejectsStaleRelease|TestManifestTransportLeaseOnlyAllowsOneConcurrentOwner)$'
+NETSETUP_TESTS='^(TestEnableIPv4LinkLocalUsesTemporaryDeviceModification|TestEnableIPv4LinkLocalRejectsUnsafeInterfaceBeforeCommand|TestEnableIPv4LinkLocalReturnsBoundedCommandFailure)$'
+
+run_go_targets() {
+  go test -count=1 ./internal/portal -run "$PORTAL_TESTS"
+  go test -count=1 ./internal/daemon -run "$DAEMON_TESTS"
+  go test -count=1 ./internal/recovery -run "$RECOVERY_TESTS"
+  go test -count=1 ./internal/preserve -run "$PRESERVE_TESTS"
+  go test -count=1 ./internal/engine -run "$ENGINE_TESTS"
+  go test -count=1 ./internal/state -run "$STATE_TESTS"
+  go test -count=1 ./internal/netsetup -run "$NETSETUP_TESTS"
+}
+
+run_go_targets
+
+go test -race -count=1 ./internal/portal -run "$PORTAL_TESTS"
+go test -race -count=1 ./internal/daemon -run "$DAEMON_TESTS"
+go test -race -count=1 ./internal/recovery -run "$RECOVERY_TESTS"
+go test -race -count=1 ./internal/preserve -run "$PRESERVE_TESTS"
+go test -race -count=1 ./internal/state -run "$STATE_TESTS"
+go test -race -count=1 ./internal/netsetup -run "$NETSETUP_TESTS"
+
+go vet ./...
+python3 -m unittest discover -s nemo -p 'test_*.py'
+./packaging/tests/package_test.sh
+./packaging/tests/lifecycle_test.sh
+./packaging/tests/installer_test.sh
+./packaging/tests/acceptance_script_test.sh
+./packaging/tests/transport_v2_acceptance_script_test.sh
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  git diff --check
+else
+  echo "Git metadata unavailable in this sandbox; validate the working-tree diff externally."
+fi

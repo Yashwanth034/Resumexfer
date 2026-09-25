@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible Resumexfer problem
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux Mint / Ubuntu + Nemo
+        - Other Linux
+        - Windows
+        - macOS Intel
+        - macOS Apple Silicon
+        - Android/browser side
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Resumexfer version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Transfer path
+      options:
+        - Android USB/MTP → computer
+        - Computer → Android USB/MTP
+        - Local Wi-Fi/LAN Share
+        - Local Wi-Fi/LAN Receive
+        - USB → Wi-Fi handoff
+        - Wi-Fi → USB handoff
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Do not include capability links, credentials, personal files, or private logs.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

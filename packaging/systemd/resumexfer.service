@@ -1,0 +1,14 @@
+[Unit]
+Description=Resumexfer background transfer recovery
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/resumexferd
+Restart=on-failure
+RestartSec=2
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
