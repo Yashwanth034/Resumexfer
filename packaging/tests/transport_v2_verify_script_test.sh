@@ -5,7 +5,7 @@ SCRIPT="$ROOT/scripts/verify-transport-v2.sh"
 
 test -x "$SCRIPT"
 bash -n "$SCRIPT"
-grep -Fq 'GOTOOLCHAIN=${GOTOOLCHAIN:-go1.23.2}' "$SCRIPT"
+grep -Fq 'GOTOOLCHAIN=${GOTOOLCHAIN:-auto}' "$SCRIPT"
 grep -Fq 'TestManagedReceiveContinuesSameManifestFromVerifiedPhysicalPartial' "$SCRIPT"
 grep -Fq 'TestOrdinaryWifiUploadAdoptsVerifiedCheckpointIntoManagedUSBRecovery' "$SCRIPT"
 grep -Fq 'TestReceiveUploadSerializesSameOffsetAcrossPortalRoutes' "$SCRIPT"

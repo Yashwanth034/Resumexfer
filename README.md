@@ -32,7 +32,7 @@ Normal MTP copies are often all-or-nothing from the user's point of view. Resume
 | macOS Intel | ✅ Build-validated | ❌ Not yet | Standalone CLI |
 | macOS Apple Silicon | ✅ Build-validated | ❌ Not yet | Standalone CLI |
 
-Windows/macOS support in 0.2.0 is the portable local-network/browser transfer engine. Resumexfer does **not** claim native Explorer/Finder Android USB resume yet.
+Windows/macOS support in 0.2.1 is the portable local-network/browser transfer engine. Resumexfer does **not** claim native Explorer/Finder Android USB resume yet.
 
 See [Platform support](docs/PLATFORMS.md) for the exact scope.
 
@@ -43,7 +43,7 @@ See [Platform support](docs/PLATFORMS.md) for the exact scope.
 Install the Debian package from the release:
 
 ```bash
-sudo apt install ./resumexfer_0.2.0_amd64.deb
+sudo apt install ./resumexfer_0.2.1_amd64.deb
 nemo -q
 ```
 
@@ -85,8 +85,8 @@ resumexfer receive ~/Downloads
 
 ```powershell
 # Windows
-.\resumexfer_0.2.0_windows_amd64.exe share "C:\Users\user\Downloads\Example"
-.\resumexfer_0.2.0_windows_amd64.exe receive "C:\Users\user\Downloads"
+.\resumexfer_0.2.1_windows_amd64.exe share "C:\Users\user\Downloads\Example"
+.\resumexfer_0.2.1_windows_amd64.exe receive "C:\Users\user\Downloads"
 ```
 
 ## What happens when a transfer is interrupted?
@@ -186,7 +186,7 @@ Platform claims remain separate from test claims: Windows/macOS standalone binar
 
 ## Build from source
 
-Requirements for the portable CLI are Go 1.22+.
+Requirements for the portable CLI are Go 1.25+.
 
 ```bash
 go test ./...
