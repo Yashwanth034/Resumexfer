@@ -5,7 +5,7 @@
 ### Security
 
 - Updated the portable WebRTC/Pion dependency stack, including WebRTC 4.2.20 and DTLS 3.1.8.
-- Updated `golang.org/x/crypto` to 0.52.0, `golang.org/x/net` to 0.55.0, and the matching `x/sys` dependency.
+- Updated `golang.org/x/crypto` to 0.53.0, `golang.org/x/net` to 0.56.0, and `golang.org/x/sys` to 0.46.0.
 
 ### Maintenance
 
