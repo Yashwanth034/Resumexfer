@@ -219,6 +219,11 @@ python3 scripts/public-safety-check.py
 - [Security](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
+- [MIT License](LICENSE)
+
+## License
+
+Resumexfer is released under the [MIT License](LICENSE).
 
 ## Current limitations
 

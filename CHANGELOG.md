@@ -5,13 +5,14 @@
 ### Security
 
 - Updated the portable WebRTC/Pion dependency stack, including WebRTC 4.2.20 and DTLS 3.1.8.
-- Updated `golang.org/x/crypto` to 0.52.0 together with its matching `x/net` and `x/sys` dependencies.
+- Updated `golang.org/x/crypto` to 0.52.0, `golang.org/x/net` to 0.55.0, and the matching `x/sys` dependency.
 
 ### Maintenance
 
 - Raised the source-build requirement to Go 1.25 and stopped verification scripts from forcing the obsolete Go 1.23.2 toolchain.
 - Updated GitHub Actions checkout, setup-go, and upload-artifact actions to their current Dependabot-proposed major versions.
 - Grouped future Go-module and GitHub Actions Dependabot updates to reduce pull-request noise.
+- Added the MIT license for the public repository.
 
 ## 0.2.0 — 2026-09-25
 
