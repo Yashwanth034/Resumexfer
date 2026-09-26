@@ -8,6 +8,29 @@ On Linux Mint/Ubuntu with Nemo, Resumexfer can take ownership of Android USB/MTP
 
 No Android companion app and no Resumexfer cloud account are required.
 
+## Screenshots
+
+### Browser transfer and resume
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/phone-wifi-transfer.png" alt="Resumexfer browser file transfer on Android"></td>
+    <td width="50%"><img src="docs/screenshots/phone-resume-verification.png" alt="Resumexfer verifying existing progress before resuming"></td>
+  </tr>
+</table>
+
+### Linux / Nemo integration
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/nemo-receive-dialog.png" alt="Resumexfer receive dialog in Nemo"></td>
+    <td width="33%"><img src="docs/screenshots/nemo-receive-context-menu.png" alt="Receive with Resumexfer action in the Nemo context menu"></td>
+    <td width="33%"><img src="docs/screenshots/nemo-share-context-menu.png" alt="Share with Resumexfer action in the Nemo context menu"></td>
+  </tr>
+</table>
+
+The two context-menu images were cleaned/recreated from photos for legibility; the labels and layout reflect the tested Nemo integration.
+
 ## Why Resumexfer?
 
 Normal MTP copies are often all-or-nothing from the user's point of view. Resumexfer adds a durable job model around the transfer:
